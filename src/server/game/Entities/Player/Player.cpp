@@ -12694,6 +12694,16 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
     }
     else
     {
+ 
+        // search free slot
+      uint8 searchSlotStart = INVENTORY_SLOT_ITEM_START;
+    // new bags can be directly equipped
+    if (!pItem && pProto->GetClass() == ITEM_CLASS_CONTAINER && pProto->GetSubClass() == ITEM_SUBCLASS_CONTAINER &&
+        (pProto->GetBonding() == NO_BIND || pProto->GetBonding() == BIND_WHEN_PICKED_UP))
+        searchSlotStart = INVENTORY_SLOT_BAG_START;
+
+    res = CanStoreItem_InInventorySlots(searchSlotStart, INVENTORY_SLOT_ITEM_END, dest, pProto, count, false, pItem, bag, slot);
+
         // search free slot at first
         for (uint8 i = 0; i < 4; ++i)
             if (slots[i] != NULL_SLOT && !GetItemByPos(INVENTORY_SLOT_BAG_0, slots[i]))
@@ -14324,44 +14334,43 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec &des
     }*/ // it doesn't work that way!
 
     // search free slot
-    res = CanStoreItem_InInventorySlots(INVENTORY_SLOT_ITEM_START, GetInventoryEndSlot(), dest, pProto, count, false, pItem, bag, slot);
+      uint8 searchSlotStart = INVENTORY_SLOT_ITEM_START;
+    // new bags can be directly equipped
+    if (!pItem && pProto->GetClass() == ITEM_CLASS_CONTAINER && pProto->GetSubClass() == ITEM_SUBCLASS_CONTAINER &&
+        (pProto->GetBonding() == NO_BIND || pProto->GetBonding() == BIND_WHEN_PICKED_UP))
+        searchSlotStart = INVENTORY_SLOT_BAG_START;
+
+    res = CanStoreItem_InInventorySlots(searchSlotStart, INVENTORY_SLOT_ITEM_END, dest, pProto, count, false, pItem, bag, slot);
     if (res != EQUIP_ERR_OK)
     {
         if (no_space_count)
             *no_space_count = count + no_similar_count;
         return res;
     }
-
     if (count == 0)
     {
         if (no_similar_count == 0)
             return EQUIP_ERR_OK;
-
         if (no_space_count)
             *no_space_count = count + no_similar_count;
         return EQUIP_ERR_ITEM_MAX_COUNT;
     }
-
     for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
     {
         res = CanStoreItem_InBag(i, dest, pProto, count, false, true, pItem, bag, slot);
         if (res != EQUIP_ERR_OK)
             continue;
-
         if (count == 0)
         {
             if (no_similar_count == 0)
                 return EQUIP_ERR_OK;
-
             if (no_space_count)
                 *no_space_count = count + no_similar_count;
             return EQUIP_ERR_ITEM_MAX_COUNT;
         }
     }
-
     if (no_space_count)
         *no_space_count = count + no_similar_count;
-
     return EQUIP_ERR_INV_FULL;
 }
 
@@ -14496,20 +14505,6 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count, uint32& ItemID) 
             if (b_found)
                 continue;
         }
-
-        // search free slot
-        bool b_found = false;
-        for (int t = INVENTORY_SLOT_ITEM_START; t < inventoryEnd; ++t)
-        {
-            if (inv_slot_items[t-INVENTORY_SLOT_ITEM_START] == 0)
-            {
-                inv_slot_items[t-INVENTORY_SLOT_ITEM_START] = 1;
-                b_found = true;
-                break;
-            }
-        }
-        if (b_found)
-            continue;
 
         // search free slot in bags
         for (int t = INVENTORY_SLOT_BAG_START; !b_found && t < INVENTORY_SLOT_BAG_END; ++t)
