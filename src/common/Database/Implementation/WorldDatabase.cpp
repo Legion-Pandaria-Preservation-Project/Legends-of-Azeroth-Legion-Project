@@ -93,13 +93,13 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_DEL_DISABLES, "DELETE FROM disables WHERE entry = ? AND sourceType = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_BLACKMARKET_TEMPLATE, "SELECT marketId, sellerNpc, itemEntry, quantity, minBid, duration, chance, bonusListIDs FROM blackmarket_template", CONNECTION_SYNCH);
 
-    PrepareStatement(WORLD_DEL_EVENTOBJECT, "DELETE FROM eventobject WHERE guid = ?", CONNECTION_ASYNC);;
+    PrepareStatement(WORLD_DEL_EVENTOBJECT, "DELETE FROM eventobject WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_INS_EVENTOBJECT, "INSERT INTO eventobject (guid, id , map, zoneId, areaId, spawnMask, phaseMask, position_x, position_y, position_z, orientation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_EVENTOBJECT_NEAREST,   "SELECT guid, id, position_x, position_y, position_z, map, (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) AS order_ FROM eventobject WHERE map = ? AND (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) <= ? ORDER BY order_", CONNECTION_SYNCH);
-
+    PrepareStatement(WORLD_UPD_QUEST_OBJECTIVE_BUGGED_STATE, "UPDATE quest_objectives SET Bugged = ? WHERE ID = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_CHARACTER_TEMPLATES, "SELECT ID, Name, Description, level, ilevel, fromID FROM character_template", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_CHARACTER_TEMPLATE_CLASSES, "SELECT FactionGroup, Class, X, Y, Z, O, MapID, Money, RaceMask FROM character_template_class WHERE TemplateID = ?", CONNECTION_SYNCH);
 	
-	PrepareStatement(WORLD_INS_CREATURE_ADDON_EMOTESTATE, "REPLACE INTO creature_addon(guid, emote) VALUES (?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_CREATURE_ADDON_EMOTESTATE, "REPLACE INTO creature_addon(guid, emote) VALUES (?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_UPD_CREATURE_ADDON_EMOTESTATE, "UPDATE creature_addon SET emote = ? WHERE guid = ?", CONNECTION_ASYNC);
 }
